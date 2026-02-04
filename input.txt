@@ -1,0 +1,28 @@
+The Huffman algorithm is a popular greedy, lossless data compression
+ method developed by David Huffman in 1952. It reduces data size by 
+ assigning shorter binary codes to more frequent characters and longer
+codes to less frequent ones. It uses a binary tree, built via a priority
+queue, to ensure "prefix-free" codes (no code is a prefix of another), 
+allowing unambiguous decoding. 
+Key Aspects of the Huffman Algorithm:
+Methodology: It is a greedy algorithm that builds a frequency-sorted binary
+tree from the bottom up.
+Variable-Length Encoding: Unlike fixed-length encoding (e.g., ASCII), frequently 
+used characters get fewer bits, maximizing compression efficiency.
+Prefix Rule: The generated codes are prefix-free, meaning the decoder can interpret 
+the bitstream without ambiguity.
+Applications: Commonly used in ZIP, GZIP, JPEG, and MP3 file formats. 
+Steps to Build a Huffman Tree:
+Calculate Frequency: Count the occurrences of each character in the data.
+Create Leaf Nodes: Create a leaf node for each character and add it to a priority queue, ordered
+ by frequency (lowest first).
+Build Tree: While there is more than one node in the queue:
+Extract the two nodes with the lowest frequencies.
+Create a new internal node with a frequency equal to the sum of the two nodes' frequencies.
+Make the two extracted nodes children of this new node.
+Insert the new node back into the priority queue.
+Assign Codes: Traverse the tree from the root, assigning '0' for left branches and '1' for 
+right branches to generate codes. 
+Example:
+If 'e' appears 10 times and 'z' appears 1 time, 'e' might be coded as 0 and 'z' as 110. 
+The total bits required are minimized because the shorter code (0) is used more often. 
