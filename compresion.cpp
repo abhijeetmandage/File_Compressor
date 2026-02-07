@@ -21,6 +21,7 @@ class node{
 };
 
 class compare {
+    public:
     bool operator()(node* l, node* r) {
         return l->frequency > r->frequency;
     }
@@ -57,6 +58,53 @@ map<char,string> huffmantree(map<char,int>& freq){
     generatehuffmancode(pq.top(),"",huffmanbinarycode);
     return huffmanbinarycode;
 }
+
+void compresedtext(string bits,string filename){
+    ofstream out(filename);
+    out<<bits;
+    out.close();
+}
+
+void compresedbinaryfile(string bits,string filename){
+    ofstream file(filename,ios::binary);
+
+    char byts=0;
+    int count=0;
+    for(int i=0;i<bits.length();i++){
+        byts=byts<<1;
+
+        if(bits[i]=='1'){
+            byts=byts|1;
+        }
+        count++;
+
+        if(count==8){
+            file.put(byts);
+            byts=0;
+            count=0;
+        }
+    }
+    if(count>0){
+        byts=byts<<(8-count);
+        file.put(byts);
+    }
+    file.close();
+}
+
+void savecodeinfile(map<char,string>&huffmanbinarycode,string filename){
+    ofstream out(filename);
+    for(auto p:huffmanbinarycode){
+        if(p.first=='\n'){
+            out<<"\\n "<<p.second<<endl;
+        }else if(p.first==' '){
+            out<<"' ' "<<p.second<<endl;
+        }else{
+            out<<p.first<<" "<<p.second<<endl;
+        }
+    }
+    out.close();
+
+}
 int main(){
     ifstream inf("input.txt");
     if(!inf){
@@ -73,8 +121,20 @@ int main(){
     for(char c:text){
         freq[c]++;
     }
-    for(auto v:freq){
-        cout<<v.first<<" "<<v.second<<endl;
+    map<char,string>hcode=huffmantree(freq);
+    string compresedtext1="";
+    for(auto c:text){
+        compresedtext1+=hcode[c];
     }
+    //compresed code file 
+    compresedtext(compresedtext1,"compreseddatafile.txt");
+    //compresed binary file
+    compresedbinaryfile(compresedtext1,"compresedbinary_file.bin");
+    //save code (in the from 0 and 1)
+    savecodeinfile(hcode,"codeinfo.txt");
+    cout<<"Compresion Complete"<<endl;
+    cout<<"Size of original file is "<<text.length()*8<<" bits"<<endl;
+    ifstream f("compresedbinary_file.bin", ios::binary | ios::ate);
+    cout << "size of compressed file is " << f.tellg()*8 << " bits" << endl;
     return 0; 
 }
