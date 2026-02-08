@@ -6,7 +6,6 @@
 using namespace std;
 class node{
     public:
-
     char data;
     unsigned frequency;
     node* left;
