@@ -67,15 +67,13 @@ void compresedtext(string bits,string filename){
 
 void compresedbinaryfile(string bits,string filename){
     ofstream file(filename,ios::binary);
-
+    int toatalbits=bits.size();
+    file.write((char*)&toatalbits,sizeof(toatalbits));
     char byts=0;
     int count=0;
-    for(int i=0;i<bits.length();i++){
-        byts=byts<<1;
 
-        if(bits[i]=='1'){
-            byts=byts|1;
-        }
+    for(char b:bits){
+        byts=byts<<1|(b-'0');
         count++;
 
         if(count==8){
