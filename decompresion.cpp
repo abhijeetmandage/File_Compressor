@@ -55,8 +55,6 @@ void  decodebinary_file(string binfile,string hcodefile,string outputfile){
    in.close();
    out.close();
    cout<<"original text restoared in file "<<outputfile<<endl;
-   cout << "Reverse map size = " << reversecode.size() << endl;
-
 }
 int main(){
     decodebinary_file("compresedbinary_file.bin","codeinfo.txt","decoded_outputfile.txt");
