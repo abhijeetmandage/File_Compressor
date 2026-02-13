@@ -52,6 +52,7 @@ void generatecode(node* root,string code,map<char,string>&huffmancode){
     generatecode(root->right,code+'1',huffmancode);
 }
 
+
 int main(){
     ifstream in("input.txt");
     if(!in){
