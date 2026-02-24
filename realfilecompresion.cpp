@@ -52,7 +52,104 @@ void generatecode(node* root,string code,map<char,string>&huffmancode){
     generatecode(root->right,code+'1',huffmancode);
 }
 
+void compression(const string& inputfile,const string outputfile,map<char,int>&freq,string text){
+    ifstream in(inputfile,ios::binary);
+    if(!in){
+        cout<<"file is not found"<<endl;
+    }
+    // string text((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
+    // in.close();
+    node* root=fromhuffmantree(freq);
+    map<char,string>binarycode;
+    generatecode(root,"",binarycode);
 
+    //stoare all bits in string
+    string bits="";
+    for(auto c:text){
+        bits+=binarycode[c];
+    }
+
+    ofstream out(outputfile,ios::binary);
+    if(!out){
+        cout<<"file not found"<<endl;
+        return;
+    }
+
+    int n=freq.size();
+    out.write((char*)&n,sizeof(n));
+
+    for(auto &v : freq){
+        out.write(&v.first,sizeof(v.first));
+        out.write((char*)&v.second,sizeof(v.second));
+    }
+
+    int bitecount=bits.size();
+    out.write((char*)&bitecount,sizeof(bitecount));
+
+    char byte=0;
+    int count=0;
+
+    for(char b : bits){
+        byte=(byte<<1)|(b-'0');
+        count++;
+
+        if(count==8){
+            out.put(byte);
+            byte=0;
+            count=0;
+        }
+    }
+    if(count>0){
+        byte=byte<<(8-count);
+        out.put(byte);
+    }
+    out.close();
+    cout<<"compresion done"<<outputfile<<endl; 
+}
+
+string decompressinram(const string& inputefile){
+    ifstream in(inputefile,ios::binary);
+    if(!in){
+        cout<<"file is not found"<<endl;
+    }
+
+    int n;
+    in.read((char*)&n,sizeof(n));
+    map<char,int> freq;
+    for (int i = 0; i < n; i++) {
+        char c;
+        int f;
+        in.read(&c, sizeof(c));
+        in.read((char*)&f, sizeof(f));
+        freq[c] = f;
+    }
+    int bitcount;
+    in.read((char*)&bitcount,sizeof(bitcount));
+
+    vector<char> bytes((istreambuf_iterator<char>(in)), {});
+    in.close();
+
+    node* root=fromhuffmantree(freq);
+    string bit="";
+    for(char byte:bytes){
+        for(int i=7;i>=0;i--){
+            if(bit.size()==bitcount){
+                break;
+            }
+            bit+=((byte>>i)&1)?'1':'0';
+        }
+    }
+    string output="";
+    node* curr=root;
+    for(char b:bit){
+        curr=(b=='0')? curr->left:curr->right;
+        if(curr->left==NULL && curr->right==NULL ){
+            output+=curr->data;
+            curr=root;
+        }
+    }
+    return output;
+}
 int main(){
     ifstream in("input.txt");
     if(!in){
@@ -60,6 +157,8 @@ int main(){
     }else{
         cout<<"File is found"<<endl;
     }
+    string inputefile="input.txt";
+    string compresed_file="compresed_input.txt";
 
     map<char,int>freq;
     string text,line;
@@ -71,5 +170,15 @@ int main(){
     }
     in.close();
 
+    compression(inputefile,compresed_file,freq,text);
+    string decompresedtext=decompressinram(compresed_file);
+    cout<<decompresedtext<<endl;
 
+    ifstream inf(inputefile,ios::binary|ios::ate);
+    ifstream comf(compresed_file,ios::binary|ios::ate);
+    cout<<"original file size: "<<inf.tellg()<<endl;
+    cout<<"compresed file size: "<<comf.tellg()<<endl;
+    inf.close();
+    comf.close();
+    return 0;
 }
