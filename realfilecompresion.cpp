@@ -193,9 +193,6 @@ int main()
 
     compression(inputefile, compresed_file, freq, text);
     cout<<"---------------------------------------------------------"<<endl;
-    // string decompresedtext=decompressinram(compresed_file);
-    // cout<<decompresedtext<<endl;
-
     ifstream inf(inputefile, ios::binary | ios::ate);
     ifstream comf(compresed_file, ios::binary | ios::ate);
     cout << "Original File Size: " << (double)inf.tellg() / 1024 << " " << "kb" << endl;
